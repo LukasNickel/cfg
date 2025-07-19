@@ -1,6 +1,6 @@
 ;;; org-roam.el -*- lexical-binding: t; -*-
 
-; org roam bindings
+                                        ; org roam bindings
 (map! :leader
       (:prefix-map ("r" . "regular")
        :desc "find file"            "f"   #'org-roam-node-find
@@ -14,8 +14,8 @@
        :desc "tag (org)"            "T"   #'org-set-tags-command
        :desc "rebuid db"            "d"   #'org-roam-db-build-cache
        :desc "cite"                 "c"   #'org-ref-insert-cite-link
-     )
-)
+       )
+      )
 
 ;; Why not
 (use-package! org-roam-bibtex
@@ -24,7 +24,7 @@
   :config
   (require 'org-ref)
   (setq orb-preformat-keywords
-   '("citekey" "title" "url" "file" "author-or-editor" "keywords" "pdf" "doi" "author" "tags" "year" "author-bbrev")))
+        '("citekey" "title" "url" "file" "author-or-editor" "keywords" "pdf" "doi" "author" "tags" "year" "author-bbrev")))
 
 
 (use-package! org-roam
@@ -38,21 +38,26 @@
 
 ;; TODO: The templates could go in extra files
 (after! org-roam
-    (setq org-roam-capture-templates
-          `(("s" "standard" plain "%?"
-     :if-new
-     (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
-      "#+title: ${title}\n#+filetags: \n\n ")
-     :unnarrowed t)
-        ("d" "definition" plain
-         "%?"
-         :if-new
-         (file+head "${slug}.org" "#+title: ${title}\n#+filetags: definition \n\n* Definition\n\n\n* Examples\n")
-         :unnarrowed t)
-        ("r" "ref" plain "%?"
+  (setq org-roam-capture-templates
+        `(("s" "standard" plain "%?"
+           :if-new
+           (file+head "standard/%<%Y>/%<%Y%m%d%H%M%S>-${slug}.org"
+                      "#+title: ${title}\n#+filetags: \n\n ")
+           :unnarrowed t)
+          ("c" "calendar" plain "%?"
+           :if-new
+           (file+head "calendar/%<%Y>/%<%Y%m%d%H%M%S>-${slug}.org"
+                      "#+title: ${title}\n#+filetags:calendar \n\n ")
+           :unnarrowed t)
+          ("d" "definition" plain
+           "%?"
+           :if-new
+           (file+head "definitions/${slug}.org" "#+title: ${title}\n#+filetags: definition \n\n* Definition\n\n\n* Examples\n")
+           :unnarrowed t)
+          ("r" "ref" plain "%?"
            :if-new
            (file+head "references/notes/${citekey}.org"
-           "#+title: ${title}
+                      "#+title: ${title}
 \n#+filetags: reference ${keywords}
 \n* Summary \n
 \n* Notes
@@ -62,22 +67,17 @@
 :END:\n")
            :unnarrowed t
            :jump-to-captured t)
-        ("p" "presentation" plain "%?"
-         :if-new
-         (file+head "${slug}.org"
-"#+title: ${title}
+          ("p" "presentation" plain "%?"
+           :if-new
+           (file+head "presentations/${slug}.org"
+                      "#+title: ${title}
 #+filetags: presentation
 #+AUTHOR: Lukas Nickel
 #+OPTIONS: H:2 toc:t num:t
 #+LATEX_CLASS: beamer
 #+LATEX_CLASS_OPTIONS: [presentation, 10pt]
-#+BEAMER_THEME: tudo
+#+BEAMER_THEME: metropolis
 #+LATEX_HEADER: \\usepackage{amsmath}
 #+LATEX_HEADER: \\usepackage{amssymb}
-#+LATEX_HEADER: \\usepackage{mathtools}
-#+LATEX_HEADER: \\usepackage{csquotes}
-#+LATEX_HEADER: \\usepackage{unicode-math}
-#+LATEX_HEADER: \\usepackage{siunitx}
-#+LATEX_HEADER: \\unimathsetup{math-style=ISO, bold-style=ISO, nabla=upright, partial=upright, mathrm=sym}
 ")
-         :unnarrowed t))))
+           :unnarrowed t))))

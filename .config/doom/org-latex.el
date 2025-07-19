@@ -1,18 +1,23 @@
 ;;; orglatex.el -*- lexical-binding: t; -*-
-;; Use latexmk instead of always pdflatex
-;; This should make things more uniform everywhere
-;; Use minted
 (map! :map cdlatex-mode-map :i "TAB" #'cdlatex-tab)
-                                        ;(add-to-list 'org-latex-packages-alist '("outputdir=build" "minted"))
 (add-to-list 'org-latex-packages-alist '("" "cleveref"))
+
+(with-eval-after-load 'org
+  (plist-put org-format-latex-options :background 'auto)
+  (setq org-export-allow-bind-keywords t))
+
 (use-package! engrave-faces
   :after ox-latex
   :config
   (add-to-list 'org-latex-engraved-options '("linenos" "true"))
   (setq org-latex-engraved-theme "t")
   )
-;;(setq org-latex-src-block-backend 'engraved)
-(add-to-list 'exec-path "/home/lukas/.local/texlive/2023/bin/x86_64-linux")
+(setq org-latex-src-block-backend 'engraved)
+
+(add-to-list 'exec-path "/home/lukas/.local/texlive/2024/bin/x86_64-linux")
+(setq org-latex-compiler "lualatex")
+(setq org-latex-pdf-process (list "latexmk -f %f -output-directory=%o"))
+
 (defun org-export-output-file-name-modified (orig-fun extension &optional subtreep pub-dir)
   (unless pub-dir
     (setq pub-dir "build")
@@ -20,10 +25,6 @@
       (make-directory pub-dir)))
   (apply orig-fun extension subtreep pub-dir nil))
 (advice-add 'org-export-output-file-name :around #'org-export-output-file-name-modified)
-
-
-(setq org-latex-compiler "lualatex")
-(setq org-latex-pdf-process (list "latexmk -f %f -output-directory=%o"))
 
 (add-to-list 'org-latex-classes
              '("scrbook"
@@ -33,18 +34,6 @@
                ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
                ("\\paragraph{%s}" . "\\paragraph*{%s}")
                ("\\subparagraph{%s}" . "\\subparagraph*{%s}"))
-             )
-(add-to-list 'org-latex-classes
-             '("diss"
-               "\\documentclass[a4paper, 11pt, twoside, onecolumn, openright]{memoir}
-[NO-DEFAULT-PACKAGES]
-\\usepackage[giveninits=true,urldate=iso,firstinits=true,maxbibnames=5]{biblatex}
-\\addbibresource{/home/lukas/org/references/library.bib}
-\\input{~/Nextcloud/uni_shared/PHD/header.tex}"
-               ("\\chapter{%s}" . "\\chapter*{%s}")
-               ("\\section{%s}" . "\\section*{%s}")
-               ("\\subsection*{%s}" . "\\subsection*{%s}")
-               )
              )
 
                                         ; https://emacs.stackexchange.com/questions/51328/how-can-i-position-label-outside-caption-in-latex-export-of-figures
@@ -92,3 +81,4 @@ For non-floats, see `org-latex--wrap-label'."
               (if short (format "[%s]" (org-export-data short info)) "")
               (org-export-data main info)
               label)))))
+
